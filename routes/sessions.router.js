@@ -3,6 +3,7 @@ import { usuariosModelo } from '../models/usuario.model.js';
 import { generaHash, validaPass } from '../utils.js';
 import passport from 'passport';
 export const router = Router()
+import jwt from "jsonwebtoken";
 
 // router.post('/register',async(req,res)=>{
 
@@ -105,21 +106,35 @@ router.post(
 //     }
 // })
 
+
 router.post(
     "/login",
-    passport.authenticate("login", {failureRedirect:"/api/sessions/error", }), 
-    (req, res)=>{
+    passport.authenticate("login", { failureRedirect: "/api/sessions/error" }),
+    (req, res) => {
+        const usuario = req.user;
 
-        // si authenticate sale OK agrega en la req
-        // una preperty user
-        // req.user
+        const token = jwt.sign(
+            { 
+                id: usuario._id,
+                nombre: usuario.nombre,
+                email: usuario.email,
+                role: usuario.role 
+            },
+            "CoderCoder123",
+            { expiresIn: "1h" }
+        );
 
-        req.session.usuario=req.user
+        res.cookie("tokenCookie", token, {
+            httpOnly: true,
+            maxAge: 3600000
+        });
 
-        res.setHeader('Content-Type','application/json');
-        return res.status(200).json({payload:`Login exitoso para ${req.user.nombre}`});
+        return res.status(200).json({
+            message: "Login OK",
+            token
+        });
     }
-)
+);
 
 router.get("/logout", (req, res) => {
     req.session.destroy(error => {
