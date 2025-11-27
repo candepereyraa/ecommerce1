@@ -13,11 +13,14 @@ import { router as sessionsRouter } from './routes/sessions.router.js';
 import { router as routerVistas} from './routes/views.router.js';
 import { config } from './config/config.js';
 
+import cookieParser from "cookie-parser";
+
 
 const PORT=config.PORT;
 
 const app=express();
 
+app.use(cookieParser());
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname,'/views'));
@@ -45,7 +48,9 @@ app.use(passport.session())   // solo si usamos sessions
 app.use("/api/sessions", sessionsRouter)
 app.use('/', routerVistas)
 
-
+app.get("/login", (req, res) => {
+    res.render("login");
+});
 const server=app.listen(PORT,()=>{
     console.log(`Server escuchando en puerto ${PORT}`);
 });
