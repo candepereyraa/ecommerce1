@@ -11,3 +11,10 @@ export const generateToken = (user) => {
     { expiresIn: "1h" }
   );
 };
+
+// === Función temporal para generar hash de admin ===
+export const generarHashAdmin = () => {
+  const password = "admin123"; 
+  const hash = generaHash(password);
+  console.log("Hash generado para admin:", hash);
+};
